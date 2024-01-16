@@ -1,53 +1,88 @@
-import pygame
+import pygame, sys, random
+from pygame import Vector2
+
+
 
 pygame.init()
 
-#SCREEN
-screenWidth = 1200
-screenHeight = 1200
 
-screen = pygame.display.set_mode((screenWidth,screenHeight))
 
-player = pygame.Rect(300,250,50,50)
-player2 = pygame.Rect(300,250,50,50)
+clock = pygame.time.Clock()
 
-#GAME LOOP
-run = True
-while run:
+cellSize = 40
+numberOfCells = 27
+W = H = cellSize * numberOfCells
+screen = pygame.display.set_mode((W,H))
 
-    screen.fill((255,255,255))
-    pygame.draw.rect(screen,(255,0,0),player)
-    pygame.draw.rect(screen,(0,255,0),player2)
+stacksPath = 'graphics/stacks.png'
+fruitPath =  'graphics/Minion.png'
+snakePath = ''
 
-    key = pygame.key.get_pressed()
-    pygame.draw.circle(screen,(12,34,23),(600,600),30)
+appleVisualization = pygame.image.load(fruitPath).convert_alpha()
+scaledImage = pygame.transform.scale(appleVisualization,(40,40))
 
-    if key[pygame.K_a] == True:
-        player.move_ip(-1,0)
-    elif key[pygame.K_d] == True:
-        player.move_ip(1,0)
-    elif key[pygame.K_w] == True:
-        player.move_ip(0,-1)
-    elif key[pygame.K_s] == True:
-        player.move_ip(0,1)
-
-    ##elif key[pygame.K_SPACE] == True:
-    if key[pygame.K_LEFT] == True:
-        player2.move_ip(-1,0)
-    elif key[pygame.K_RIGHT] == True:
-        player2.move_ip(1,0)
-    elif key[pygame.K_UP] == True:
-        player2.move_ip(0,-1)
-    elif key[pygame.K_DOWN] == True:
-        player2.move_ip(0,1)    
+class Apple:
+    def __init__(self):
+        self.positionX = random.randint(0,numberOfCells - 1)
+        self.positionY = random.randint(0,numberOfCells - 1)
+        self.placement = Vector2(self.positionX, self.positionY)
     
+    def refreshCords(self):
+        self.positionX = random.randint(0,numberOfCells - 1)
+        self.positionY = random.randint(0,numberOfCells - 1)
+        return
     
-    #EVENT HANDLER
+    def spawnApple(self):
+        appleShape = pygame.Rect(self.placement.x * cellSize, self.placement.y * cellSize, cellSize, cellSize)
+        screen.blit(scaledImage,appleShape)
+        ##pygame.draw.rect(screen,(200,40,40),appleShape)
+
+class Snake:
+    def __init__ (self):
+        self.body = [Vector2(5,10),Vector2(6,10),Vector2(7,10)]
+        self.direction = Vector2(1,0)
+
+    def drawSnake(self):
+        for block in self.body:
+            piece = pygame.Rect(block.x * cellSize, block.y * cellSize, cellSize, cellSize)
+            pygame.draw.rect(screen,(128,23,189),piece)
+    
+    def moveSnake(self):
+        bodyTmp = self.body[:-1]
+        bodyTmp.insert(0,bodyTmp + self.direction)
+
+apple = Apple()
+snake = Snake()
+
+#def movements():
+#    if key[pygame.K_a] == True:
+ #       player.move_ip(-1,0)
+  #  elif key[pygame.K_d] == True:
+   #     player.move_ip(1,0)
+    #elif key[pygame.K_w] == True:
+     #   player.move_ip(0,-1)
+    #elif key[pygame.K_s] == True:
+     #   player.move_ip(0,1)
+
+#class snake:
+
+
+while True:
+
+    screen.fill((50,150,20))
+    #key = pygame.key.get_pressed()
+    
+    apple.spawnApple()  
+    snake.drawSnake()
+    ##apple.refreshCords()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            run = False
+            pygame.quit()
+            sys.exit()
 
     pygame.display.update()
+    clock.tick(60) #fps
 
+   
 
-pygame.quit()
