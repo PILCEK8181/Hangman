@@ -5,10 +5,7 @@ from pygame import Vector2
 
 pygame.init()
 
-
-
 clock = pygame.time.Clock()
-
 cellSize = 40
 numberOfCells = 27
 W = H = cellSize * numberOfCells
@@ -49,38 +46,54 @@ class Snake:
     
     def moveSnake(self):
         bodyTmp = self.body[:-1]
-        bodyTmp.insert(0,bodyTmp + self.direction)
+        bodyTmp.insert(0,bodyTmp[0] + self.direction)
+        self.body = bodyTmp[:]
 
-apple = Apple()
-snake = Snake()
+##apple = Apple()
+##snake = Snake()
 
-#def movements():
-#    if key[pygame.K_a] == True:
- #       player.move_ip(-1,0)
-  #  elif key[pygame.K_d] == True:
-   #     player.move_ip(1,0)
-    #elif key[pygame.K_w] == True:
-     #   player.move_ip(0,-1)
-    #elif key[pygame.K_s] == True:
-     #   player.move_ip(0,1)
+def movements():
+    if (action[pygame.K_a] == True) or (action[pygame.K_LEFT] == True):
+        mainGame.snake.direction = (-1,0)
+    elif (action[pygame.K_d] == True) or (action[pygame.K_RIGHT] == True):
+        mainGame.snake.direction = (1,0)
+    elif (action[pygame.K_w] == True) or (action[pygame.K_UP] == True):
+        mainGame.snake.direction = (0,-1)
+    elif (action[pygame.K_s] == True) or (action[pygame.K_DOWN] == True):
+        mainGame.snake.direction = (0,1)
 
-#class snake:
+class MAIN:
+    def __init__(self):
+        self.snake = Snake()
+        self.apple = Apple()
+    
+    def update(self):
+        self.snake.moveSnake()
+        
+    def draw(self):
+        self.snake.drawSnake()
+        self.apple.spawnApple()
 
+SCREEN_UPDATE = pygame.USEREVENT
+pygame.time.set_timer(SCREEN_UPDATE,150) #timer
+
+mainGame = MAIN()
 
 while True:
 
-    screen.fill((50,150,20))
-    #key = pygame.key.get_pressed()
-    
-    apple.spawnApple()  
-    snake.drawSnake()
     ##apple.refreshCords()
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == SCREEN_UPDATE:
+            mainGame.update()
+        if event.type == pygame.KEYDOWN:
+            action = pygame.key.get_pressed()
+            movements()
 
+    screen.fill((50,150,20))        
+    mainGame.draw()
     pygame.display.update()
     clock.tick(60) #fps
 
